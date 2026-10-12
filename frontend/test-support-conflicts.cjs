@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),C=require('./project-core.js');
+const region=(id,category='chair',offset=0,n=10)=>({id,category,geometry:{type:'surface-voxels',origin:[0,0,0],cell:.04,cells:Array.from({length:n},(_,i)=>[i+offset,0,0])}});
+let a=region('a'),b=region('b','chair',5),before=JSON.stringify([a,b]);
+let r=C.supportConflicts([a,b]);assert.equal(r.pairs.length,1);assert.equal(r.pairs[0].common_cells,5);assert.equal(r.pairs[0].kind,'possible_duplicate');assert.equal(r.pairs[0].fraction_a,.5);assert.equal(JSON.stringify([a,b]),before);
+b.category='screen';assert.equal(C.supportConflicts([a,b]).pairs[0].kind,'category_overlap');
+b.geometry.origin=[.02,0,0];r=C.supportConflicts([a,b]);assert.equal(r.pairs.length,0);assert.equal(r.stats.incompatible_pairs,1);
+b=region('b');b.geometry.cell=.08;assert.equal(C.supportConflicts([a,b]).stats.incompatible_pairs,1);
+b=region('b','chair',100);r=C.supportConflicts([a,b]);assert.equal(r.pairs.length,0);assert.equal(r.stats.pairs_checked,1);assert.equal(r.stats.cell_comparisons,0);
+b=region('b','chair',6);assert.equal(C.supportConflicts([a,b]).pairs.length,0,'four shared cells below minimum');
+a=region('a','chair',0,20);b=region('b','chair',15,20);assert.equal(C.supportConflicts([a,b]).pairs.length,0,'five shared cells below ratio');
+a=region('a');b=region('b');b.geometry.cells.push(...b.geometry.cells);r=C.supportConflicts([a,b]);assert.equal(r.pairs[0].cells_b,10,'duplicate cells not double counted');
+r=C.supportConflicts([a,b],{maxCells:10});assert.equal(r.stats.budget_skipped_regions,1);assert.equal(r.stats.eligible,1);
+r=C.supportConflicts([a,region('b')],{maxComparisons:5});assert.equal(r.stats.budget_skipped_pairs,1);assert.equal(r.pairs.length,0,'never threshold a partly compared pair');
+r=C.supportConflicts([a,region('b'),region('c')],{maxPairs:1});assert.equal(r.stats.pairs_checked,1);assert.equal(r.stats.budget_skipped_pairs,2);
+assert.equal(C.supportConflicts([{id:'mesh',geometry:{type:'surface-mask'}}]).stats.unsupported,1);
+assert.equal(C.supportConflicts([{...a,geometry:{...a.geometry,cells:[[NaN,0,0]]}}]).stats.unsupported,1);
+assert.throws(()=>C.supportConflicts([],{maxPairs:0}),/budget/);
+console.log('PASS support conflicts: exact cells, same/different classes, no cross-grid guesses, sparse separation, thresholds, dedup, explicit incomplete budgets and no mutation.');

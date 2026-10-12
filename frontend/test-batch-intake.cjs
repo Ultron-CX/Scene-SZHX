@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),C=require('./project-core.js');
+const a={id:'a',category:'chair'},b={id:'b',category:'chair',provenance:{evidence_id:'a'.repeat(64)}},c={id:'c',category:'floor'};
+const existing=C.register(a,[],'00000000-0000-0000-0000-000000000001');existing.reviews=[{checks:{identity:'pass'}}];
+const objects=[existing],regions=[a,b,c],before=JSON.stringify({objects,regions});
+const plan=C.registrationPlan(regions,objects);assert.equal(plan.existing,1);assert.equal(plan.without_evidence,1);assert.deepEqual(plan.categories,{chair:1,floor:1});
+let n=2;const added=C.registerBatch(regions,objects,()=>`00000000-0000-0000-0000-${String(n++).padStart(12,'0')}`);
+assert.equal(added.length,2);assert.deepEqual(added.map(o=>o.region_ids),[['b'],['c']]);assert.deepEqual(added[0].evidence_ids,['a'.repeat(64)]);
+assert(added.every(o=>!o.reviews.length&&!o.task_qualification&&o.identity_state==='candidate_not_human_confirmed'));
+assert.equal(C.registrationPlan(regions,[...objects,...added]).regions.length,0);assert.equal(JSON.stringify({objects,regions}),before);
+assert.throws(()=>C.registrationPlan([a,a],[]),/重复/);assert.throws(()=>C.registerBatch(regions,objects,()=>existing.object_id.slice(4)),/重复/);
+assert.deepEqual(C.registerBatch([],objects,()=>{throw Error('empty must not allocate')}),[]);
+console.log('PASS batch candidate intake: ownership skip, idempotence, duplicate rejection, evidence references, no mutation or review promotion.');

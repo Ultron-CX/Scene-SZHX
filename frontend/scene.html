@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SceneSem · 三维语义工作台</title><link rel="stylesheet" href="/scene.css"></head><body>
+<header><strong>SceneSem <em>/</em> 三维语义工作台</strong><span id="sceneName">全场景加载中</span><a href="/legacy" target="_blank">旧版点标签</a></header>
+<main><aside>
+<h2>自动结构标注</h2><p id="autoSummary" class="help">正在读取墙体 / 地面 / 天花板候选…</p><button id="applyAuto" class="primary">加入自动标注候选</button><p class="meta">基于局部平面几何，不是物体识别模型；可直接使用候选，也可选择复核，不强制。</p>
+<h2>创建空间标注</h2><label>区域形状<select id="shape"><option value="rectangle">矩形轮廓 + 厚度</option><option value="polygon">不规则轮廓 + 厚度（支持凹形）</option></select></label><label>工作平面<select id="plane"><option value="xy">XY · 地面 / 水平轮廓</option><option value="xz">XZ · 立面（沿 −Y 加厚）</option><option value="yz">YZ · 立面（沿 +X 加厚）</option></select></label><label>厚度 / 高度（米）<input id="thickness" type="number" min="0.01" max="100" step="0.05" value="2.5"></label><p class="help">首点吸附表面，后续点固定在同一工作平面。矩形取两个对角点；不规则轮廓按边界顺序取点，最后点“生成区域”。</p>
+<div class="row"><button id="pick" class="primary">开始选点</button><button id="browse" class="active">浏览</button></div>
+<div class="row"><button id="popAnchor">撤回一点</button><button id="clearDraft">取消草稿</button></div><button id="finishShape">生成区域</button><div id="anchorCount" class="meta">未选点</div>
+<label>语义类别<select id="category"></select></label><label>实例编号<input id="instance" readonly aria-label="自动实例编号"></label>
+<label>状态<select id="status"><option value="draft">人工标注 / 未复核</option><option value="proposed">自动候选 / 未复核</option><option value="reviewed">已人工复核</option></select></label>
+<h2>区域调整 <span id="editing">新建</span></h2><div class="gridLabel"><span></span><span>X</span><span>Y</span><span>Z</span></div><div class="boxGrid" id="dimensions"></div><div id="vertexEditor"></div>
+<p class="meta">多边形可编辑局部 U/V 顶点与厚度；中心坐标用于整体平移。任意曲面、带孔拓扑暂不支持。</p>
+<div class="row"><button id="commit" class="primary">保存区域</button><button id="newBox">新建</button></div>
+<div class="row"><button id="undo">撤销</button><button id="delete" disabled>删除当前区域</button></div><div id="currentSelection" class="meta">尚未选择区域</div>
+<h2>语义检查（可选）</h2><label class="check"><input id="reviewMode" type="checkbox"> 开启语义检查面板</label><div id="reviewPanel" hidden><label class="check"><input id="filterEnabled" type="checkbox"> 只查看指定类别</label><label>显示内容<select id="filter"><option value="unknown">未被任何区域覆盖</option></select></label><label class="check"><input id="semanticColor" type="checkbox"> 场景按类别着色</label><p class="help">空间区域不是精细分割；自动平面边界可能跨过门窗。关闭检查不改变标签复核状态。</p></div>
+<h2>空间区域 <span id="count">0</span></h2><div id="boxList"></div>
+<div class="row"><button id="export">导出 JSON</button><button id="importButton">导入 JSON</button></div><input id="importFile" type="file" accept=".json" hidden><p class="meta">本机草稿自动保存；正式备份请导出。</p>
+</aside><section class="workspace"><nav><div class="seg"><button id="gsMode" class="active">3DGS 实景</button><button id="pointMode">彩色点云</button></div><select id="quality" aria-label="3DGS 清晰度"><option value="medium">标准 · 108 万</option><option value="low">轻量 · 27 万</option><option value="full">完整 · 430 万</option></select><button id="home">全景</button><button id="top">俯视</button><button id="focus">聚焦当前盒</button></nav>
+<div id="viewport"><canvas id="sceneCanvas"></canvas><canvas id="overlay" aria-label="三维场景操作区"></canvas><div id="viewBadge">准备渲染器…</div><div class="clip"><label>高度剖切 <output id="clipValue"></output><input id="clipZ" type="range" step="0.05"></label><button id="unclip">恢复</button></div></div>
+<footer><div id="message" role="status" aria-live="polite">初始化中</div><small>WASD 水平移动 · Q/E 升降 · Shift 加速 · 左键旋转 / 选点 · 右键平移 · 滚轮缩放 · Ctrl+Z 撤销</small></footer>
+</section></main><script src="/vendor/playcanvas.js"></script><script src="/boxes.js"></script><script src="/scene-app.js"></script></body></html>

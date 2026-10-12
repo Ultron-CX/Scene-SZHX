@@ -1,0 +1,16 @@
+{
+  "schema": "scenesem.local-config.v1",
+  "source_root": "/path/to/permitted-scene",
+  "scene_dir": "artifacts/example-scene",
+  "fixture_dir": "artifacts/example-fixture",
+  "proposals": "artifacts/example-structures/proposals.json",
+  "legacy_proposals": "artifacts/example-proposals/proposals.json",
+  "engine_dir": "vendor/playcanvas",
+  "models_dir": "models",
+  "panoramic_poses": "poses/panoramicPoses.csv",
+  "visual_files": {
+    "low": "visual/point_cloud_low.ply",
+    "medium": "visual/point_cloud_medium.ply",
+    "full": "visual/point_cloud.ply"
+  }
+}

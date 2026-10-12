@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),B=require('./boxes.js');
+const base=path.resolve(__dirname,'../artifacts'),meta=JSON.parse(fs.readFileSync(path.join(base,'k2-annotation-scene-v2/scene.json'),'utf8'));
+const proposals=JSON.parse(fs.readFileSync(path.join(base,'k2-annotation-proposals-v1/proposals.json'),'utf8'));
+assert.equal(B.validate(proposals,meta).length,56);
+const lshape=B.fromContour([[0,0,0],[3,0,0],[3,1,0],[1,1,0],[1,3,0],[0,3,0]],'xy',2);
+assert(B.contains(lshape,.5,2,1));assert(!B.contains(lshape,2,2,1));assert(!B.contains(lshape,.5,.5,3));
+assert.throws(()=>B.fromContour([[0,0,0],[2,2,0],[0,2,0],[2,0,0]],'xy',1));
+const rectangle=B.fromContour([[0,0,2],[2,3,2]],'xy',1,true);assert.deepEqual(rectangle.min,[0,0,2]);assert.deepEqual(rectangle.max,[2,3,3]);
+const region={...lshape,id:'manual',sequence:1,category:'other',status:'draft'};assert(B.validBox(region));assert.deepEqual(B.validate(B.save([region],meta),meta),[region]);
+const matcher=B.compile([region]);assert(matcher(.5,2,1,'other').visible);assert(matcher(2,2,1,'unknown').visible);
+// Execute the actual save/delete functions against minimal UI state, not a browser screenshot.
+const elements=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{value:'',disabled:false,textContent:'',getContext:()=>({})});return elements.get(id);};
+const context={BoxCore:B,structuredClone,console,crypto:require('node:crypto').webcrypto,document:{getElementById:element},setTimeout,clearTimeout};vm.createContext(context);
+const source=fs.readFileSync(path.join(__dirname,'scene-app.js'),'utf8').replace(/init\(\);\s*$/,'');vm.runInContext(source,context);
+context.testMeta=meta;context.testRegion=region;
+vm.runInContext(`meta=testMeta;draft=clone(testRegion);delete draft.id;selected=null;boxes=[];$('category').value='other';$('status').value='draft';
+persist=()=>true;filterScene=()=>{};refreshList=()=>{};fields=()=>{};setMode=()=>{};vertexFields=()=>{};
+saveDraft(); if(boxes.length!==1||selected!==boxes[0].id)throw Error('Save did not retain selection');
+deleteCurrent();if(boxes.length!==0||selected!==null||undoStack.length!==2)throw Error('Delete did not remove selected region');
+boxes=undoStack.pop();if(boxes.length!==1)throw Error('Undo did not restore deletion');
+selected=null;draft=clone(testRegion);anchors=[[0,0,0]];deleteCurrent();if(draft!==null||anchors.length)throw Error('Draft deletion failed');`,context);
+console.log('PASS: 56 proposals, concave exclusion, fixed-plane rectangle, invalid contour rejection, region roundtrip, actual save/delete/undo paths');

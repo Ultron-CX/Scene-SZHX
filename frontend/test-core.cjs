@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const c = require('./core.js');
+const data = {source_sha256:'fixture-hash',ids:[11,12,13]};
+const labels = new Map([[11,{category:'墙',instance:'wall-1',status:'draft'}]]);
+const doc = c.serialize(labels,data);
+assert.deepEqual(c.validate(JSON.parse(JSON.stringify(doc)),data),labels);
+assert.throws(()=>c.validate({...doc,source_sha256:'wrong'},data));
+assert.throws(()=>c.validate({...doc,coverage:'all_points'},data));
+assert.throws(()=>c.validate({...doc,annotations:[...doc.annotations,...doc.annotations]},data));
+assert.throws(()=>c.validate({...doc,annotations:[{...doc.annotations[0],point_id:99}]},data));
+assert.throws(()=>c.validate({...doc,annotations:[{...doc.annotations[0],status:'invalid'}]},data));
+const points=[[2,2,1],[2,2,4],[4,4,0],null];
+assert.deepEqual([...c.selectRect(points,[0,0,3,3],6,6,false)],[1]);
+assert.deepEqual([...c.selectRect(points,[0,0,3,3],6,6,true)],[0,1]);
+assert.deepEqual([...c.selectRect(points,[3,3,5,5],6,6,false)],[2]);
+assert.equal(c.validate({...doc,annotations:[]},data).size,0);
+console.log('PASS: 10 label identity / import / depth-selection assertions');

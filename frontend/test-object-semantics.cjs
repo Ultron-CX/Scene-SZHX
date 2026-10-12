@@ -1,0 +1,42 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const B=require('./boxes.js'),C=require('./object-core.js');
+const g=C.geometry([[0,0,0],[.01,.01,.01],[.16,0,0],[.16,.16,0]]),b={...C.bounds(g),geometry:g,id:'obj',category:'table',sequence:1,status:'proposed'};
+assert(B.validBox(b));assert.equal(g.cells.length,3);assert(B.contains(b,.02,.02,.02));assert(!B.contains(b,.1,.1,.02),'Sparse semantic support must not fill AABB air');
+const meta={scene_id:'test',coordinate_frame:'world',source_hashes:{a:'hash'}};
+assert.deepEqual(B.validate(B.save([b],meta),meta),[b]);const bad=structuredClone(b);bad.geometry.cells.push([NaN,0,0]);assert(!B.validBox(bad));
+const components=C.split(C.geometry([[0,0,0],[.08,0,0],[2,2,2]]),1);assert.equal(components.length,2);
+const raw=new Uint8Array(16),dv=new DataView(raw.buffer);dv.setFloat32(0,.25,false);dv.setUint32(4,0xffffffff,false);dv.setFloat32(8,.5,false);dv.setFloat32(12,.75,false);
+assert.deepEqual(Array.from(C.decodeDepth(raw,2,2,true)),[.5,.75,.25,NaN]);
+const near=.1,far=10,A=(far+near)/(near-far),P=2*far*near/(near-far),depth=new Float32Array(64*64).fill((2-near)/(far-near));
+const frame={width:64,height:64,near,far,pose_id:'test',depth,inverse:[1,0,0,0,0,1,0,0,0,0,0,1/P,0,0,-1,A/P]};
+const result={model:'test',image_sha256:'test',threshold:.6,license_scope:'research_evaluation_only'},component={category:'screen',label:'monitor',score:.8,runs:Array.from({length:24},(_,y)=>[y+20,20,44])};
+const proposals=C.fromMask(component,frame,result);assert(proposals.length);for(const p of proposals){assert(B.validBox({...p,id:'p',sequence:1}));assert(p.min[2]<-1.9&&p.max[2]>-2.1,'Depth must unproject to visible plane at z=-2');}
+const list=[];C.merge(list,structuredClone(proposals));C.merge(list,structuredClone(proposals));assert.equal(list.length,proposals.length,'Repeated view must merge same support');
+ assert.equal(C.viewCount(list[0]),1,'Repeat at the same pose is not multi-view evidence');
+ const inst=C.fromMask({...component,instance_id:1},frame,{...result,backend:'instance',cell_m:.04,detail:'detail'});
+ assert.equal(inst.length,1);assert.equal(inst[0].geometry.cell,.04);
+ const pair=[structuredClone(inst[0])],other=structuredClone(inst[0]);other.provenance.observations[0].instance_id=2;
+ C.merge(pair,[other]);assert.equal(pair.length,2,'Distinct instances in one view must not merge');
+ const two=[structuredClone(inst[0])],next=structuredClone(inst[0]);next.provenance.observations[0].view_id='another-pose';
+ C.merge(two,[next]);assert.equal(two.length,1);assert.equal(C.viewCount(two[0]),2);assert.equal(two[0].provenance.evidence_state,'multi_view_supported');
+ assert.throws(()=>C.fromMask({...component,runs:[[99,0,999]]},frame,result));
+// Test real UI candidate acceptance with mutable browser state mocked, no GPU claim.
+const nodes=new Map(),element=()=>({value:'',hidden:false,checked:true,textContent:'',disabled:false,children:[],style:{},append(...xs){this.children.push(...xs);},replaceChildren(){this.children=[];},setAttribute(){},getContext:()=>({})});
+const get=id=>{if(!nodes.has(id))nodes.set(id,element());return nodes.get(id);};
+ get('objectMultiOnly').checked=false;
+const human={id:'human',category:'chair',sequence:1,status:'reviewed',min:[10,10,0],max:[11,11,1]},item={...structuredClone(proposals[0]),id:'candidate',sequence:1};
+const context={BoxCore:B,ObjectCore:C,structuredClone,console,document:{getElementById:get,createElement:element},window:{addEventListener(){}},crypto:require('node:crypto').webcrypto};vm.createContext(context);
+vm.runInContext(fs.readFileSync(__dirname+'/scene-app.js','utf8').replace(/init\(\);\s*$/,''),context);context.human=human;context.item=item;
+vm.runInContext('boxes=[clone(human)];filterScene=()=>{};persist=()=>true;',context);
+// Seed inside the actual closure to exercise its buttons, not expose a production injection hook.
+vm.runInContext(fs.readFileSync(__dirname+'/object-ui.js','utf8').replace('const label=b=>','pending.push(clone(item)); const label=b=>'),context);
+get('objectAccept').onclick();const saved=JSON.parse(vm.runInContext('JSON.stringify(boxes)',context));assert.deepEqual(saved[0],human);assert.equal(saved[1].status,'proposed');assert.equal(saved[1].provenance.proposal_id,'candidate');assert.equal(vm.runInContext('undoStack.length',context),1);
+ context.multi={...structuredClone(two[0]),id:'multi',sequence:1};
+ vm.runInContext('boxes=[clone(human)];undoStack=[];',context);get('objectMultiOnly').checked=true;
+ vm.runInContext(fs.readFileSync(__dirname+'/object-ui.js','utf8').replace('const label=b=>','pending.push(clone(item),clone(multi)); const label=b=>'),context);
+ assert.equal(context.ObjectUI.pending().length,1);assert.equal(context.ObjectUI.pending()[0].id,'multi');
+ get('objectAccept').onclick();assert.equal(vm.runInContext('boxes.length',context),2);
+ get('objectMultiOnly').checked=false;get('objectMultiOnly').onchange();
+ assert.equal(context.ObjectUI.pending().length,1);assert.equal(context.ObjectUI.pending()[0].id,'candidate','Filtered single-view candidate is preserved, not silently accepted/deleted');
+const html=fs.readFileSync(__dirname+'/workbench.html','utf8'),ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size);
+console.log('PASS: sparse voxel membership, region roundtrip, invalid geometry guard, spatial splitting, GPU-byte decode/Y flip, perspective unprojection, view merge, real acceptance/manual protection/undo, unique UI IDs. Live browser capture not tested.');

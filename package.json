@@ -1,0 +1,12 @@
+{
+  "name": "scenesem",
+  "version": "0.2.2",
+  "private": true,
+  "description": "Local scene semantic annotation workbench, extracted from the v13 prototype",
+  "scripts": {
+    "test": "node scripts/test.cjs",
+    "check:http": "node scripts/check_http.cjs",
+    "check:s1": "node scripts/check_s1.cjs"
+  },
+  "engines": { "node": ">=20" }
+}

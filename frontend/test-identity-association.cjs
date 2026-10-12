@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),C=require('./project-core.js'),crypto=require('node:crypto');
+const regions=Array.from({length:5},(_,i)=>({id:'r'+i,category:i===2?'screen':'chair',sequence:i+1,min:[i,0,0],max:[i+1,1,1]}));
+const a=C.register(regions[0],[],crypto.randomUUID()),b=C.register(regions[2],[],crypto.randomUUID()),other=C.register(regions[4],[],crypto.randomUUID());
+a.region_ids.push('r1');b.region_ids.push('r3');a.alias='keep';b.alias='checkpoint only';a.evidence_ids=['a'.repeat(64)];b.evidence_ids=['b'.repeat(64)];
+a.reviews=[{checks:{identity:'pass'},notes:'old target review'}];b.reviews=[{checks:{identity:'issue'},notes:'old source review'}];b.mask_corrections=[{notes:'old source correction'}];
+const objects=[a,b,other],before=JSON.stringify([objects,regions]),id=crypto.randomUUID();
+const p=C.identityAssociationPlan(regions,objects,'r0','r2',id),target=p.objects.find(o=>o.object_id===a.object_id);
+assert.deepEqual(target.region_ids,['r0','r1','r2','r3']);assert.equal(p.objects.length,2);assert.equal(target.alias,'keep');assert.deepEqual(target.reviews,a.reviews);assert.equal(target.review_stale,true);assert.equal(target.identity_state,'candidate_not_human_confirmed');assert.equal(target.task_qualification,false);
+assert.deepEqual(target.evidence_ids,[...a.evidence_ids,...b.evidence_ids]);assert.equal(target.mask_corrections,undefined);assert.equal(p.source_mask_corrections,1);assert.deepEqual(p.categories,['chair','screen']);assert.deepEqual(p.objects.find(o=>o.object_id===other.object_id),other);assert.equal(JSON.stringify([objects,regions]),before);
+const reverse=C.identityAssociationPlan(regions,objects,'r2','r0',id);assert.equal(reverse.target_id,b.object_id);assert.equal(reverse.objects.find(o=>o.object_id===b.object_id).alias,b.alias);
+assert.throws(()=>C.identityAssociationPlan(regions,objects,'r0','r1',id),/同一档案/);assert.throws(()=>C.identityAssociationPlan(regions,objects,'r0','r0',id),/不同/);assert.throws(()=>C.identityAssociationPlan(regions,objects,'r0','absent',id),/有效/);
+assert.throws(()=>C.identityAssociationPlan(regions,[a,{...b,region_ids:['r0']}],'r0','r2',id),/重复归属/);assert.throws(()=>C.identityAssociationPlan(regions,[{...a,region_ids:['r0','missing']},b],'r0','r2',id),/失效/);
+assert.throws(()=>C.identityAssociationPlan(regions,[{...a,pending_review:{}},b],'r0','r2',id),/未提交/);
+const unowned=C.identityAssociationPlan(regions,[],'r0','r2',id);assert.equal(unowned.target_id,'obj-'+id);assert.deepEqual(unowned.objects[0].reviews,[]);assert.deepEqual(unowned.objects[0].region_ids,['r0','r2']);assert.equal(unowned.source_id,null);
+assert.throws(()=>C.identityAssociationPlan(regions,[],'r0','r2','bad'),/无效/);
+const attach=C.identityAssociationPlan(regions,[a],'r0','r2',id);assert.equal(attach.target_id,a.object_id);assert.deepEqual(attach.region_ids,['r0','r1','r2']);
+const newTarget=C.identityAssociationPlan(regions,[b],'r0','r2',id);assert.equal(newTarget.target_before,null);assert.equal(newTarget.source_id,b.object_id);assert.equal(newTarget.source_reviews,1);assert.equal(newTarget.objects[0].reviews.length,0);
+console.log('PASS identity association: whole-record scope, ownership, evidence union, review invalidation, preserved geometry, direction, unowned regions and no mutation.');

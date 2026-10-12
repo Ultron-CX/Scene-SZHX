@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SceneSem · 语义标注工作台</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 'Segoe UI','Microsoft YaHei',sans-serif;color:#dce7ef;background:#0b1118}*{box-sizing:border-box}body{margin:0}header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #293443;background:#111b26}h1{font-size:19px;margin:0}header span{color:#75dbca;font-size:14px}main{display:grid;grid-template-columns:290px 1fr;height:calc(100vh - 64px)}aside{padding:20px;overflow:auto;border-right:1px solid #293443;background:#111b26}h2{font-size:14px;color:#8fa4b9;font-weight:500;margin:20px 0 8px}h2:first-child{margin-top:0}button,input,select{font:inherit;border:1px solid #36495d;border-radius:5px;background:#192738;color:#eaf3fa;padding:8px;min-width:0}button{cursor:pointer}button:hover{background:#294059}button:disabled{opacity:.4;cursor:wait}button.primary{background:#127868;border-color:#29b69b}button.active{border-color:#5de0c5;color:#5de0c5}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #5de0c5}label{display:block;font-size:14px;margin-top:10px}label input:not([type=checkbox]),label select{display:block;width:100%;margin-top:4px}.row{display:flex;gap:8px;margin-top:10px}.row>*{flex:1}.note{font-size:13px;color:#92a8ba;margin:10px 0}.stage{min-width:0;position:relative;display:flex;flex-direction:column}.toolbar{padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#121c28}.toolbar button{font-size:14px}.view{flex:1;position:relative;min-height:300px;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none}.badge{position:absolute;left:18px;top:14px;pointer-events:none;background:#101b29cc;padding:8px 12px;font-size:14px;border-radius:5px}footer{padding:10px 18px;min-height:46px;font-size:14px;border-top:1px solid #293443}#message{color:#88dcc9}#summary{margin:10px 0;color:#b8ccda}#instances{max-height:180px;overflow:auto;font-size:14px}.instance{display:block;width:100%;text-align:left;margin:5px 0;font-size:14px}input[type=range]{width:100%}#import{display:none}@media(max-width:800px){main{grid-template-columns:230px 1fr}aside{padding:12px}header{padding:0 12px}header span{display:none}}
+</style></head><body>
+<header><h1>SceneSem <span> / </span> 语义标注工作台</h1><span>本地离线 · K2 局部点云 · 原始文件只读</span></header>
+<main><aside>
+<h2>01 / 标注对象</h2><div id="asset">正在加载点云…</div><div id="summary">—</div>
+<label>类别<input id="category" list="classes" value="墙面" maxlength="80"><datalist id="classes"><option>墙面</option><option>地面</option><option>天花板</option><option>门</option><option>窗</option><option>柜台</option><option>椅子</option><option>设备</option><option>标识</option><option>其他</option></datalist></label>
+<label>实例编号<input id="instance" value="wall-001" maxlength="80"></label>
+<label>复核状态<select id="review"><option value="draft">待复核</option><option value="reviewed">已人工复核</option></select></label>
+<div class="row"><button id="apply" class="primary" disabled>应用标签</button><button id="erase" disabled>清除标签</button></div>
+<div class="row"><button id="undo" disabled>撤销</button><button id="deselect" disabled>取消选择</button></div>
+<h2>02 / 显示与剖切</h2><label><input id="colored" type="checkbox" checked> 显示语义颜色</label>
+<label>高度下限 <output id="zminout"></output><input id="zmin" type="range" step="0.01"></label>
+<label>高度上限 <output id="zmaxout"></output><input id="zmax" type="range" step="0.01"></label>
+<p class="note">降低上限可隐藏天花板；剖切后重新框选。默认仅选每个屏幕像素最前点，不保证实体遮挡完整。</p>
+<h2>03 / 标签文件</h2><div class="row"><button id="save" disabled>导出 JSON</button><button id="load" disabled>导入 JSON</button></div><input id="import" type="file" accept=".json,application/json">
+<p class="note">自动保留本浏览器草稿；请导出正式备份。标签只覆盖当前代表点，不自动传播至全量点云。</p>
+<h2>类别 / 实例</h2><div id="instances">暂无标签</div>
+</aside><section class="stage"><div class="toolbar"><button id="orbit" class="active">旋转</button><button id="select">框选</button><button id="top">俯视</button><button id="front">正视</button><button id="reset">复位</button><label style="margin:0"><input id="through" type="checkbox"> 穿透选择</label></div>
+<div class="view"><canvas id="canvas" aria-label="三维彩色点云；旋转或框选模式拖动操作"></canvas><div class="badge" id="badge">加载中</div></div>
+<footer><span id="message" role="status" aria-live="polite">正在准备数据</span> <span class="note">左键旋转 / 框选 · 右键平移 · 滚轮缩放 · Ctrl+Z 撤销</span></footer></section></main>
+<script src="/core.js"></script><script src="/app.js"></script></body></html>

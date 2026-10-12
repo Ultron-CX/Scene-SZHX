@@ -1,0 +1,15 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),base='http://127.0.0.1:18876',hash=b=>crypto.createHash('sha256').update(b).digest('hex');
+(async()=>{
+ const get=async route=>{const r=await fetch(base+route);assert.equal(r.status,200,route);return r;};
+ const health=await(await get('/health')).json();assert.equal(health.product,'SceneSem');assert.equal(path.resolve(health.project_root),root);assert.equal(health.port,18876);assert.equal(health.spatial_context,true);assert.equal(health.zone_boundaries,true);assert.equal(health.business_context,true);assert.equal(health.source_materials,true);assert.equal(health.dataset_materials,true);assert.equal(health.bundle_materials,true);
+ const html=await(await get('/')).text();assert(html.includes('<title>SceneSem'));assert.equal(html,fs.readFileSync(path.join(root,'frontend/workbench.html'),'utf8'));
+ const assets=[];for(const route of [...new Set([...html.matchAll(/(?:src|href)="(\/[^\"]+)"/g)].map(m=>m[1]))]){const response=await get(route),bytes=Buffer.from(await response.arrayBuffer());const local=route==='/vendor/playcanvas.js'?path.join(root,'vendor/playcanvas/build/playcanvas.js'):path.join(root,'frontend',route.slice(1));assert.equal(hash(bytes),hash(fs.readFileSync(local)),route);assets.push({route,sha256:hash(bytes),cache:response.headers.get('cache-control')});}
+ const scene=await(await get('/scene.json')).json(),status=await(await get('/semantic/status')).json(),tour=await(await get('/semantic/tour')).json();assert(status.ready&&status.instance_ready);assert.equal(tour.scene_id,scene.scene_id);assert(tour.positions.length>0);assert.equal(scene.scene_id,'digit-k2-20260904');assert.equal(scene.alignment_status,'trajectory_candidate_not_surface_certified');
+ const originalScene=JSON.parse(fs.readFileSync(path.join(root,'artifacts/k2-annotation-scene-v2/scene.json'),'utf8'));assert.deepEqual(scene,originalScene);
+ const code=fs.readFileSync(path.join(root,'frontend/scene-app.js'),'utf8');assert(code.includes("storageKey=globalThis.SceneScope?.key('digit-regions-v6:'+meta.scene_id)||'digit-regions-v6:'+meta.scene_id"));
+ assert(code.includes("!globalThis.SceneScope&&(globalThis.SceneScope?.storage||localStorage).getItem('digit-regions-v4:'+meta.scene_id)"));
+ for(const route of ['/config/local.json','/MASTER%20PLAN.md','/../AGENTS.md']){const r=await fetch(base+route);assert.equal(r.status,404,route);await r.arrayBuffer();}
+ const report={product:'SceneSem',at:new Date().toISOString(),health,assets,scene_id:scene.scene_id,source_hashes:scene.source_hashes,tour_positions:tour.positions.length,model_ready:true,old_storage_key_preserved:true,user_labels_modified:false,real_robot_commands:false,browser_gpu_tested:false};
+ if(process.argv.includes('--record'))fs.writeFileSync(path.join(root,'artifacts/migration-20260911/http.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report,null,2));
+})().catch(e=>{console.error(e);process.exitCode=1;});
