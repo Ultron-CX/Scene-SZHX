@@ -1,0 +1,219 @@
+{
+  "$defs": {
+    "AdjacencySpec": {
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "A",
+          "type": "string"
+        },
+        "b": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "B",
+          "type": "string"
+        },
+        "relation": {
+          "default": "required",
+          "enum": [
+            "required",
+            "allowed",
+            "forbidden"
+          ],
+          "title": "Relation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "a",
+        "b"
+      ],
+      "title": "AdjacencySpec",
+      "type": "object"
+    },
+    "ClearanceProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "profile_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "body_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Body Width M",
+          "type": "number"
+        },
+        "safety_margin_each_side_m": {
+          "minimum": 0,
+          "title": "Safety Margin Each Side M",
+          "type": "number"
+        },
+        "minimum_door_clear_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Door Clear Width M",
+          "type": "number"
+        },
+        "minimum_primary_corridor_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Primary Corridor Width M",
+          "type": "number"
+        },
+        "minimum_secondary_corridor_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Secondary Corridor Width M",
+          "type": "number"
+        },
+        "minimum_turning_diameter_m": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Turning Diameter M",
+          "type": "number"
+        },
+        "minimum_head_clearance_m": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Head Clearance M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "profile_id",
+        "body_width_m",
+        "safety_margin_each_side_m",
+        "minimum_door_clear_width_m",
+        "minimum_primary_corridor_width_m",
+        "minimum_secondary_corridor_width_m",
+        "minimum_turning_diameter_m",
+        "minimum_head_clearance_m"
+      ],
+      "title": "ClearanceProfile",
+      "type": "object"
+    },
+    "FootprintSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Width M",
+          "type": "number"
+        },
+        "depth_m": {
+          "exclusiveMinimum": 0,
+          "title": "Depth M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "width_m",
+        "depth_m"
+      ],
+      "title": "FootprintSpec",
+      "type": "object"
+    },
+    "SpaceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "space_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Id",
+          "type": "string"
+        },
+        "space_type": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Type",
+          "type": "string"
+        },
+        "public": {
+          "default": true,
+          "title": "Public",
+          "type": "boolean"
+        },
+        "area_min_m2": {
+          "exclusiveMinimum": 0,
+          "title": "Area Min M2",
+          "type": "number"
+        },
+        "area_max_m2": {
+          "exclusiveMinimum": 0,
+          "title": "Area Max M2",
+          "type": "number"
+        }
+      },
+      "required": [
+        "space_id",
+        "space_type",
+        "area_min_m2",
+        "area_max_m2"
+      ],
+      "title": "SpaceSpec",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "sceneforge/building-spec/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "building_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Building Id",
+      "type": "string"
+    },
+    "seed": {
+      "maximum": 2147483647,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "units": {
+      "const": "meters",
+      "default": "meters",
+      "title": "Units",
+      "type": "string"
+    },
+    "up_axis": {
+      "const": "Z",
+      "default": "Z",
+      "title": "Up Axis",
+      "type": "string"
+    },
+    "floor_count": {
+      "const": 1,
+      "default": 1,
+      "title": "Floor Count",
+      "type": "integer"
+    },
+    "footprint": {
+      "$ref": "#/$defs/FootprintSpec"
+    },
+    "clearance_profile": {
+      "$ref": "#/$defs/ClearanceProfile"
+    },
+    "spaces": {
+      "items": {
+        "$ref": "#/$defs/SpaceSpec"
+      },
+      "minItems": 1,
+      "title": "Spaces",
+      "type": "array"
+    },
+    "adjacency": {
+      "items": {
+        "$ref": "#/$defs/AdjacencySpec"
+      },
+      "title": "Adjacency",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "building_id",
+    "seed",
+    "footprint",
+    "clearance_profile",
+    "spaces"
+  ],
+  "title": "BuildingSpec",
+  "type": "object"
+}

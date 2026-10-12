@@ -1,0 +1,11 @@
+{
+  "family": "hospital",
+  "mvp_version": "hospital-outpatient/v1",
+  "fixed_seeds": [1101, 1102, 1103],
+  "required_spaces": ["entrance", "reception", "waiting", "triage", "consultation", "service_window", "corridor", "staff"],
+  "required_qualification": ["deterministic_build", "connected_public_graph", "clearance_static", "usd_stage_valid", "geniesim_load_reset_stop"],
+  "dynamic_qualification_robot": "x2",
+  "dynamic_qualification_status": "blocked_missing_authoritative_x2_assets",
+  "real_robot_commands": false
+}
+

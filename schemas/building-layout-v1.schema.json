@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "DoorOpening": {
+      "additionalProperties": false,
+      "properties": {
+        "door_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Door Id",
+          "type": "string"
+        },
+        "space_a": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space A",
+          "type": "string"
+        },
+        "space_b": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+              "type": "string"
+            },
+            {
+              "const": "exterior",
+              "type": "string"
+            }
+          ],
+          "title": "Space B"
+        },
+        "wall_axis": {
+          "enum": [
+            "x",
+            "y"
+          ],
+          "title": "Wall Axis",
+          "type": "string"
+        },
+        "center_x_m": {
+          "title": "Center X M",
+          "type": "number"
+        },
+        "center_y_m": {
+          "title": "Center Y M",
+          "type": "number"
+        },
+        "clear_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Clear Width M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "door_id",
+        "space_a",
+        "space_b",
+        "wall_axis",
+        "center_x_m",
+        "center_y_m",
+        "clear_width_m"
+      ],
+      "title": "DoorOpening",
+      "type": "object"
+    },
+    "PlacedSpace": {
+      "additionalProperties": false,
+      "properties": {
+        "space_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Id",
+          "type": "string"
+        },
+        "space_type": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Type",
+          "type": "string"
+        },
+        "public": {
+          "title": "Public",
+          "type": "boolean"
+        },
+        "rect": {
+          "$ref": "#/$defs/Rect2D"
+        }
+      },
+      "required": [
+        "space_id",
+        "space_type",
+        "public",
+        "rect"
+      ],
+      "title": "PlacedSpace",
+      "type": "object"
+    },
+    "Rect2D": {
+      "additionalProperties": false,
+      "properties": {
+        "x_m": {
+          "minimum": 0,
+          "title": "X M",
+          "type": "number"
+        },
+        "y_m": {
+          "minimum": 0,
+          "title": "Y M",
+          "type": "number"
+        },
+        "width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Width M",
+          "type": "number"
+        },
+        "depth_m": {
+          "exclusiveMinimum": 0,
+          "title": "Depth M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_m",
+        "y_m",
+        "width_m",
+        "depth_m"
+      ],
+      "title": "Rect2D",
+      "type": "object"
+    },
+    "WallSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "wall_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Wall Id",
+          "type": "string"
+        },
+        "wall_axis": {
+          "enum": [
+            "x",
+            "y"
+          ],
+          "title": "Wall Axis",
+          "type": "string"
+        },
+        "center_x_m": {
+          "title": "Center X M",
+          "type": "number"
+        },
+        "center_y_m": {
+          "title": "Center Y M",
+          "type": "number"
+        },
+        "length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "thickness_m": {
+          "default": 0.15,
+          "exclusiveMinimum": 0,
+          "title": "Thickness M",
+          "type": "number"
+        },
+        "height_m": {
+          "default": 2.8,
+          "exclusiveMinimum": 0,
+          "title": "Height M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "wall_id",
+        "wall_axis",
+        "center_x_m",
+        "center_y_m",
+        "length_m"
+      ],
+      "title": "WallSegment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "sceneforge/building-layout/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "building_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Building Id",
+      "type": "string"
+    },
+    "scene_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Scene Id",
+      "type": "string"
+    },
+    "seed_applied": {
+      "title": "Seed Applied",
+      "type": "integer"
+    },
+    "variant": {
+      "enum": [
+        "spine",
+        "mirror_x",
+        "mirror_y"
+      ],
+      "title": "Variant",
+      "type": "string"
+    },
+    "building_spec_sha256": {
+      "title": "Building Spec Sha256",
+      "type": "string"
+    },
+    "scene_spec_sha256": {
+      "title": "Scene Spec Sha256",
+      "type": "string"
+    },
+    "spaces": {
+      "items": {
+        "$ref": "#/$defs/PlacedSpace"
+      },
+      "title": "Spaces",
+      "type": "array"
+    },
+    "doors": {
+      "items": {
+        "$ref": "#/$defs/DoorOpening"
+      },
+      "title": "Doors",
+      "type": "array"
+    },
+    "walls": {
+      "items": {
+        "$ref": "#/$defs/WallSegment"
+      },
+      "title": "Walls",
+      "type": "array"
+    },
+    "real_robot_commands": {
+      "const": false,
+      "default": false,
+      "title": "Real Robot Commands",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "building_id",
+    "scene_id",
+    "seed_applied",
+    "variant",
+    "building_spec_sha256",
+    "scene_spec_sha256",
+    "spaces",
+    "doors",
+    "walls"
+  ],
+  "title": "BuildingLayout",
+  "type": "object"
+}

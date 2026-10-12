@@ -1,0 +1,188 @@
+{
+  "$defs": {
+    "AssetGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Width M",
+          "type": "number"
+        },
+        "depth_m": {
+          "exclusiveMinimum": 0,
+          "title": "Depth M",
+          "type": "number"
+        },
+        "height_m": {
+          "exclusiveMinimum": 0,
+          "title": "Height M",
+          "type": "number"
+        },
+        "up_axis": {
+          "const": "Z",
+          "default": "Z",
+          "title": "Up Axis",
+          "type": "string"
+        },
+        "units": {
+          "const": "meters",
+          "default": "meters",
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "width_m",
+        "depth_m",
+        "height_m"
+      ],
+      "title": "AssetGeometry",
+      "type": "object"
+    },
+    "AssetPhysics": {
+      "additionalProperties": false,
+      "properties": {
+        "collision_status": {
+          "enum": [
+            "missing",
+            "generated",
+            "authored",
+            "qualified"
+          ],
+          "title": "Collision Status",
+          "type": "string"
+        },
+        "rigid_body": {
+          "default": false,
+          "title": "Rigid Body",
+          "type": "boolean"
+        },
+        "mass_kg": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mass Kg"
+        }
+      },
+      "required": [
+        "collision_status"
+      ],
+      "title": "AssetPhysics",
+      "type": "object"
+    },
+    "LicenseInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "spdx_id": {
+          "title": "Spdx Id",
+          "type": "string"
+        },
+        "commercial_use_allowed": {
+          "title": "Commercial Use Allowed",
+          "type": "boolean"
+        },
+        "redistribution_allowed": {
+          "title": "Redistribution Allowed",
+          "type": "boolean"
+        },
+        "attribution_required": {
+          "default": false,
+          "title": "Attribution Required",
+          "type": "boolean"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spdx_id",
+        "commercial_use_allowed",
+        "redistribution_allowed",
+        "source_url"
+      ],
+      "title": "LicenseInfo",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "sceneforge/asset-record/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "asset_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "source": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Source",
+      "type": "string"
+    },
+    "source_version": {
+      "title": "Source Version",
+      "type": "string"
+    },
+    "uri": {
+      "title": "Uri",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Sha256",
+      "type": "string"
+    },
+    "license": {
+      "$ref": "#/$defs/LicenseInfo"
+    },
+    "geometry": {
+      "$ref": "#/$defs/AssetGeometry"
+    },
+    "physics": {
+      "$ref": "#/$defs/AssetPhysics"
+    },
+    "semantic_tags": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Semantic Tags",
+      "type": "array"
+    },
+    "approval": {
+      "enum": [
+        "unreviewed",
+        "research_only",
+        "production_approved"
+      ],
+      "title": "Approval",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "asset_id",
+    "source",
+    "source_version",
+    "uri",
+    "sha256",
+    "license",
+    "geometry",
+    "physics",
+    "semantic_tags",
+    "approval"
+  ],
+  "title": "AssetRecord",
+  "type": "object"
+}

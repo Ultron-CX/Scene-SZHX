@@ -1,0 +1,6 @@
+FROM roboease/x2-control-humble-arm64:20260818-v3
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends xvfb xauth \
+    && rm -rf /var/lib/apt/lists/*

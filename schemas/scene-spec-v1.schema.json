@@ -1,0 +1,175 @@
+{
+  "$defs": {
+    "AssetMode": {
+      "enum": [
+        "research",
+        "production"
+      ],
+      "title": "AssetMode",
+      "type": "string"
+    },
+    "AssetSlot": {
+      "additionalProperties": false,
+      "properties": {
+        "slot_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "semantic_type": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Semantic Type",
+          "type": "string"
+        },
+        "space_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Id",
+          "type": "string"
+        },
+        "minimum_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Minimum Count",
+          "type": "integer"
+        },
+        "maximum_count": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Maximum Count",
+          "type": "integer"
+        },
+        "placement": {
+          "default": "floor",
+          "enum": [
+            "floor",
+            "wall",
+            "ceiling",
+            "support_surface"
+          ],
+          "title": "Placement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "semantic_type",
+        "space_id"
+      ],
+      "title": "AssetSlot",
+      "type": "object"
+    },
+    "PointOfInterest": {
+      "additionalProperties": false,
+      "properties": {
+        "poi_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Poi Id",
+          "type": "string"
+        },
+        "semantic_type": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Semantic Type",
+          "type": "string"
+        },
+        "space_id": {
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+          "title": "Space Id",
+          "type": "string"
+        },
+        "public": {
+          "default": true,
+          "title": "Public",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "poi_id",
+        "semantic_type",
+        "space_id"
+      ],
+      "title": "PointOfInterest",
+      "type": "object"
+    },
+    "SceneFamily": {
+      "enum": [
+        "hospital",
+        "hotel",
+        "exhibition"
+      ],
+      "title": "SceneFamily",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "sceneforge/scene-spec/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scene_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Scene Id",
+      "type": "string"
+    },
+    "building_id": {
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "title": "Building Id",
+      "type": "string"
+    },
+    "family": {
+      "$ref": "#/$defs/SceneFamily"
+    },
+    "seed": {
+      "maximum": 2147483647,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "asset_mode": {
+      "$ref": "#/$defs/AssetMode"
+    },
+    "asset_slots": {
+      "items": {
+        "$ref": "#/$defs/AssetSlot"
+      },
+      "title": "Asset Slots",
+      "type": "array"
+    },
+    "points_of_interest": {
+      "items": {
+        "$ref": "#/$defs/PointOfInterest"
+      },
+      "minItems": 1,
+      "title": "Points Of Interest",
+      "type": "array"
+    },
+    "patrol_route": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+        "type": "string"
+      },
+      "minItems": 2,
+      "title": "Patrol Route",
+      "type": "array"
+    },
+    "real_robot_commands": {
+      "const": false,
+      "default": false,
+      "title": "Real Robot Commands",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "scene_id",
+    "building_id",
+    "family",
+    "seed",
+    "asset_mode",
+    "points_of_interest",
+    "patrol_route"
+  ],
+  "title": "SceneSpec",
+  "type": "object"
+}

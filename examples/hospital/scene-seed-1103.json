@@ -1,0 +1,75 @@
+{
+  "schema_version": "sceneforge/scene-spec/v1",
+  "scene_id": "hospital_service_1103",
+  "building_id": "hospital_outpatient_1103",
+  "family": "hospital",
+  "seed": 1103,
+  "asset_mode": "research",
+  "asset_slots": [
+    {
+      "slot_id": "reception_desk",
+      "semantic_type": "reception_desk",
+      "space_id": "reception",
+      "minimum_count": 1,
+      "maximum_count": 1,
+      "placement": "floor"
+    },
+    {
+      "slot_id": "waiting_chairs",
+      "semantic_type": "waiting_chair",
+      "space_id": "waiting",
+      "minimum_count": 12,
+      "maximum_count": 24,
+      "placement": "floor"
+    },
+    {
+      "slot_id": "room_signs",
+      "semantic_type": "room_sign",
+      "space_id": "primary_corridor",
+      "minimum_count": 6,
+      "maximum_count": 8,
+      "placement": "wall"
+    }
+  ],
+  "points_of_interest": [
+    {
+      "poi_id": "poi_entrance",
+      "semantic_type": "welcome",
+      "space_id": "entrance",
+      "public": true
+    },
+    {
+      "poi_id": "poi_reception",
+      "semantic_type": "service",
+      "space_id": "reception",
+      "public": true
+    },
+    {
+      "poi_id": "poi_triage",
+      "semantic_type": "triage",
+      "space_id": "triage",
+      "public": true
+    },
+    {
+      "poi_id": "poi_consult_01",
+      "semantic_type": "consultation",
+      "space_id": "consult_01",
+      "public": true
+    },
+    {
+      "poi_id": "poi_service_window",
+      "semantic_type": "service",
+      "space_id": "service_window",
+      "public": true
+    }
+  ],
+  "patrol_route": [
+    "poi_entrance",
+    "poi_reception",
+    "poi_triage",
+    "poi_consult_01",
+    "poi_service_window",
+    "poi_reception"
+  ],
+  "real_robot_commands": false
+}

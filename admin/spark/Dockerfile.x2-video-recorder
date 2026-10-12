@@ -1,0 +1,6 @@
+FROM roboease/x2-control-humble-arm64:20260818-v4
+
+USER root
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*

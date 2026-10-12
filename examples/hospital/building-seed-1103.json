@@ -1,0 +1,153 @@
+{
+  "schema_version": "sceneforge/building-spec/v1",
+  "building_id": "hospital_outpatient_1103",
+  "seed": 1103,
+  "units": "meters",
+  "up_axis": "Z",
+  "floor_count": 1,
+  "footprint": {
+    "width_m": 32.0,
+    "depth_m": 22.0
+  },
+  "clearance_profile": {
+    "profile_id": "x2_conservative_proxy_v1",
+    "body_width_m": 0.8,
+    "safety_margin_each_side_m": 0.2,
+    "minimum_door_clear_width_m": 1.2,
+    "minimum_primary_corridor_width_m": 1.8,
+    "minimum_secondary_corridor_width_m": 1.5,
+    "minimum_turning_diameter_m": 1.5,
+    "minimum_head_clearance_m": 2.2
+  },
+  "spaces": [
+    {
+      "space_id": "entrance",
+      "space_type": "entrance",
+      "public": true,
+      "area_min_m2": 18.0,
+      "area_max_m2": 30.0
+    },
+    {
+      "space_id": "reception",
+      "space_type": "reception",
+      "public": true,
+      "area_min_m2": 18.0,
+      "area_max_m2": 28.0
+    },
+    {
+      "space_id": "waiting",
+      "space_type": "waiting",
+      "public": true,
+      "area_min_m2": 60.0,
+      "area_max_m2": 90.0
+    },
+    {
+      "space_id": "triage",
+      "space_type": "triage",
+      "public": true,
+      "area_min_m2": 14.0,
+      "area_max_m2": 22.0
+    },
+    {
+      "space_id": "consult_01",
+      "space_type": "consultation",
+      "public": true,
+      "area_min_m2": 14.0,
+      "area_max_m2": 20.0
+    },
+    {
+      "space_id": "consult_02",
+      "space_type": "consultation",
+      "public": true,
+      "area_min_m2": 14.0,
+      "area_max_m2": 20.0
+    },
+    {
+      "space_id": "consult_03",
+      "space_type": "consultation",
+      "public": true,
+      "area_min_m2": 14.0,
+      "area_max_m2": 20.0
+    },
+    {
+      "space_id": "consult_04",
+      "space_type": "consultation",
+      "public": true,
+      "area_min_m2": 14.0,
+      "area_max_m2": 20.0
+    },
+    {
+      "space_id": "service_window",
+      "space_type": "service_window",
+      "public": true,
+      "area_min_m2": 12.0,
+      "area_max_m2": 18.0
+    },
+    {
+      "space_id": "primary_corridor",
+      "space_type": "corridor",
+      "public": true,
+      "area_min_m2": 70.0,
+      "area_max_m2": 100.0
+    },
+    {
+      "space_id": "staff_zone",
+      "space_type": "staff",
+      "public": false,
+      "area_min_m2": 24.0,
+      "area_max_m2": 38.0
+    }
+  ],
+  "adjacency": [
+    {
+      "a": "entrance",
+      "b": "reception",
+      "relation": "required"
+    },
+    {
+      "a": "reception",
+      "b": "waiting",
+      "relation": "required"
+    },
+    {
+      "a": "waiting",
+      "b": "triage",
+      "relation": "required"
+    },
+    {
+      "a": "waiting",
+      "b": "primary_corridor",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "consult_01",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "consult_02",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "consult_03",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "consult_04",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "service_window",
+      "relation": "required"
+    },
+    {
+      "a": "primary_corridor",
+      "b": "staff_zone",
+      "relation": "required"
+    }
+  ]
+}

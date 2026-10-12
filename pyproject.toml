@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roboease-sceneforge"
+version = "0.1.0"
+description = "Deterministic service-building scene production for RoboEase"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.10,<3",
+]
+
+[project.optional-dependencies]
+geometry = [
+  "networkx>=3.4,<4",
+  "ortools>=9.12,<10",
+  "shapely>=2.0,<3",
+]
+yaml = ["PyYAML>=6,<7"]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+sceneforge = "sceneforge.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+

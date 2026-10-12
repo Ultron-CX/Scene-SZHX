@@ -1,0 +1,26 @@
+robot:
+  robot_name: roboease_x2_ultra
+  robot_prefix: x2
+  robot_source:
+    robot_model: urdf
+    package: genie_sim_robot_model
+    pin_base_to_world: true
+    fix_base: true
+    convert_joints_to_fixed: []
+    urdf:
+      urdf_package: genie_sim_x2_model
+      urdf_file: urdf/x2_ultra_geniesim.urdf
+  init_base_pose:
+    x: 0.0
+    y: 0.0
+    z: 1.0
+    theta: 0.0
+  init_joint_pos: {}
+
+viewer_camera:
+  pos: [3.2, -3.2, 2.1]
+  lookat: [0.0, 0.0, 1.0]
+
+cameras: []
+lidars: []
+scene:

@@ -1,0 +1,45 @@
+{
+  "schema_version": "sceneforge/building-spec/v1",
+  "building_id": "hospital_outpatient_1101",
+  "seed": 1101,
+  "units": "meters",
+  "up_axis": "Z",
+  "floor_count": 1,
+  "footprint": {"width_m": 32.0, "depth_m": 22.0},
+  "clearance_profile": {
+    "profile_id": "x2_conservative_proxy_v1",
+    "body_width_m": 0.8,
+    "safety_margin_each_side_m": 0.2,
+    "minimum_door_clear_width_m": 1.2,
+    "minimum_primary_corridor_width_m": 1.8,
+    "minimum_secondary_corridor_width_m": 1.5,
+    "minimum_turning_diameter_m": 1.5,
+    "minimum_head_clearance_m": 2.2
+  },
+  "spaces": [
+    {"space_id": "entrance", "space_type": "entrance", "area_min_m2": 18, "area_max_m2": 30},
+    {"space_id": "reception", "space_type": "reception", "area_min_m2": 18, "area_max_m2": 28},
+    {"space_id": "waiting", "space_type": "waiting", "area_min_m2": 60, "area_max_m2": 90},
+    {"space_id": "triage", "space_type": "triage", "area_min_m2": 14, "area_max_m2": 22},
+    {"space_id": "consult_01", "space_type": "consultation", "area_min_m2": 14, "area_max_m2": 20},
+    {"space_id": "consult_02", "space_type": "consultation", "area_min_m2": 14, "area_max_m2": 20},
+    {"space_id": "consult_03", "space_type": "consultation", "area_min_m2": 14, "area_max_m2": 20},
+    {"space_id": "consult_04", "space_type": "consultation", "area_min_m2": 14, "area_max_m2": 20},
+    {"space_id": "service_window", "space_type": "service_window", "area_min_m2": 12, "area_max_m2": 18},
+    {"space_id": "primary_corridor", "space_type": "corridor", "area_min_m2": 70, "area_max_m2": 100},
+    {"space_id": "staff_zone", "space_type": "staff", "public": false, "area_min_m2": 24, "area_max_m2": 38}
+  ],
+  "adjacency": [
+    {"a": "entrance", "b": "reception"},
+    {"a": "reception", "b": "waiting"},
+    {"a": "waiting", "b": "triage"},
+    {"a": "waiting", "b": "primary_corridor"},
+    {"a": "primary_corridor", "b": "consult_01"},
+    {"a": "primary_corridor", "b": "consult_02"},
+    {"a": "primary_corridor", "b": "consult_03"},
+    {"a": "primary_corridor", "b": "consult_04"},
+    {"a": "primary_corridor", "b": "service_window"},
+    {"a": "primary_corridor", "b": "staff_zone"}
+  ]
+}
+
